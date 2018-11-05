@@ -14,8 +14,16 @@ public class YourSolution implements Solution {
 
 	public YourSolution() {
 		Grid table = GridFactory.create(
-						"rk",
-						"AB");
+						".rBA......",
+						"...o......",
+						"......oko.",
+						"..o.......",
+						"..........",
+						"..........",
+						"..........",
+						"..........",
+						"..........",
+						"..........");
 		System.out.println(SearchPath(table));
 
 
@@ -32,43 +40,40 @@ public class YourSolution implements Solution {
 		Coordinate current = table.getRoom();
 
 		while (!open.isEmpty()) {
-
-			if (current.equals(table.getKitchen())) {
-				return path;
-			}
-
 			Coordinate n = Instruction.NORTH.execute(current);
 			Coordinate w = Instruction.WEST.execute(current);
 			Coordinate s = Instruction.SOUTH.execute(current);
 			Coordinate e = Instruction.EAST.execute(current);
 
-			if (isHole(n, table) && isItNotEdge(n, table) && !closed.contains(n) ) {
-					open.remove(0);
+			if (current.equals(table.getKitchen())) {
+				return path;
+			} else if (isHole(n, table) && isItNotEdge(n, table) && !closed.contains(n) ) {
+					open.remove(current);
 					closed.add(current);
 					open.add(n);
 					System.out.println("új FEL");
-					current = open.get(0);
+					current = closest(current, table, open);
 					path.add(current);
 			} else if (isHole(w, table) && isItNotEdge(w, table) && !closed.contains(w)) {
-					open.remove(0);
+					open.remove(current);
 					closed.add(current);
 					open.add(w);
 					System.out.println("új BAL");
-					current = open.get(0);
+					current = closest(current, table, open);
 					path.add(current);
 			} else if (isHole(s, table) && isItNotEdge(s, table) && !closed.contains(s)){
-					open.remove(0);
+					open.remove(current);
 					closed.add(current);
 					open.add(s);
 					System.out.println("új LE");
-					current = open.get(0);
+					current = closest(current, table, open);
 					path.add(current);
 			} else if (isHole(e, table) && isItNotEdge(e, table) && !closed.contains(e)){
-					open.remove(0);
+					open.remove(current);
 					closed.add(current);
 					open.add(e);
 					System.out.println("új JOBB");
-					current = open.get(0);
+					current = closest(current, table, open);
 					path.add(current);
 				}else{
 				return path;
@@ -128,11 +133,30 @@ public class YourSolution implements Solution {
 	}
 
 	public boolean isItNotEdge(Coordinate field, Grid grid) {
-		if (field.getX() >= 0 && field.getX() <= grid.getWidth() && field.getY() >= 0 && field.getY() <= grid.getHeight()) {
+		if (field.getX() >= 0 && field.getX() <= grid.getWidth()-1 && field.getY() >= 0 && field.getY() <= grid.getHeight()-1) {
 			return true;
 		}
 		return false;
 	}
+
+	public Coordinate closest(Coordinate actual, Grid table, ArrayList<Coordinate> open) {
+		Coordinate temp = actual;
+
+		for (int i = 0; i < open.size(); i++) {
+			if (Math.sqrt((table.getKitchen().getY() - open.get(i).getY()) * (table.getKitchen().getY() - open.get(i).getY())
+							+ (table.getKitchen().getX() - open.get(i).getX()) * (table.getKitchen().getX() - open.get(i).getX())) <=
+							Math.sqrt((table.getKitchen().getY() - temp.getY()) * (table.getKitchen().getY() - temp.getY())
+											+ (table.getKitchen().getX() - temp.getX()) * (table.getKitchen().getX() - temp.getX()))) {
+				temp = open.get(i);
+			}
+
+		}
+		return temp;
+	}
+
+
+
+
 //
 //	public boolean isItKitchen(Coordinate field, Grid grid){
 //		if (field.equals(grid.getKitchen())){
